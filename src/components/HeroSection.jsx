@@ -5,6 +5,8 @@
 // ด้วยองค์ประกอบแบบไปรษณีย์และ Polaroid
 // =============================================================
 
+import SoftBlurIn from './ui/soft-blur-in';
+
 function HeroSection() {
   return (
     <section className="hero-section">
@@ -23,14 +25,14 @@ function HeroSection() {
 
       {/* Main heading */}
       <h1 className="hero-title">
-        TimeLock
+        <SoftBlurIn>TimeLock</SoftBlurIn>
         <br />
-        <span className="hero-title-accent">Digital Time Capsule</span>
+        <SoftBlurIn className="hero-title-accent" delay={400}>Digital Time Capsule</SoftBlurIn>
       </h1>
 
       {/* Subtitle */}
       <p className="hero-subtitle">
-        Seal your memories in time-locked capsules on the Ethereum blockchain.
+        Seal your memories in time-locked capsules on the Ethereum blockchain.<br />
         Immutable, transparent, and beautifully preserved — until the moment arrives to unseal them.
       </p>
 

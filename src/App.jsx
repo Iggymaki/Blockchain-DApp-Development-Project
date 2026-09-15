@@ -42,6 +42,9 @@ function App() {
       <VintageParticles />
 
       <div className="app-container">
+        {/* Full-width gradient background for the top section (Navbar + Hero) */}
+        <div className="hero-bg" />
+
         {/* ─── Navigation Bar ─── */}
         <Navbar
           walletAddress={walletAddress}
