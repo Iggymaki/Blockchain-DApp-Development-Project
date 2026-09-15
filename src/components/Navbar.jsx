@@ -115,8 +115,7 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
             </>
           ) : (
             <>
-              <img src="/matamask logo/matamask logo.png" alt="MetaMask" className="metamask-logo" />
-              <span>Connect Wallet</span>
+              ✉️ <span>Connect Wallet</span>
             </>
           )}
         </button>

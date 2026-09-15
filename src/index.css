@@ -284,12 +284,6 @@ body {
   border-color: var(--color-olive);
 }
 
-.metamask-logo {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
 .wallet-dot {
   width: 7px;
   height: 7px;
@@ -323,37 +317,8 @@ body {
    ================================================================ */
 .hero-section {
   text-align: center;
-  padding: var(--space-3xl) 0 var(--space-3xl);
+  padding: var(--space-3xl) 0 var(--space-2xl);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-}
-
-.hero-video-bg {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw;
-  height: 100%;
-  object-fit: cover;
-  z-index: -2;
-}
-
-.hero-video-overlay {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw;
-  height: 100%;
-  background: rgba(242, 235, 218, 0.45); /* Oat color with opacity */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  z-index: -1;
 }
 
 /* Decorative postmark circles */
