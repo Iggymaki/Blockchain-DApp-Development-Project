@@ -42,26 +42,31 @@ function ProfileModal({ walletAddress, provider, signer, onClose }) {
         return
       }
 
-      // ดึงข้อมูลแคปซูลทั้งหมดและ filter ตาม creator
+      // ดึงข้อมูลแคปซูลทั้งหมดและ filter ตาม creator (รองรับ ID แบบ 1-indexed)
       const userCapsules = []
       const batchSize = 10
 
-      for (let i = 0; i < total; i += batchSize) {
+      // วนลูปตั้งแต่ 1 ถึง total (inclusive) เพื่อไม่ให้พลาด capsule ล่าสุด
+      for (let i = 1; i <= total; i += batchSize) {
         const batch = []
-        for (let j = i; j < Math.min(i + batchSize, total); j++) {
+        for (let j = i; j <= Math.min(i + batchSize - 1, total); j++) {
           batch.push(
             contract.capsules(j).then((data) => ({
               id: j,
               message: data[0],
               unlockTime: Number(data[1]),
               creator: data[2],
-            }))
+            })).catch((err) => {
+              console.warn(`Failed to fetch capsule ${j}`, err)
+              return null
+            })
           )
         }
 
         const results = await Promise.all(batch)
         for (const capsule of results) {
-          if (capsule.creator.toLowerCase() === walletAddress.toLowerCase()) {
+          // ตรวจสอบว่า creator ตรงกับกระเป๋าปัจจุบัน (ข้าม capsule ที่เป็น null หรือ ID ว่าง)
+          if (capsule && capsule.creator && capsule.creator.toLowerCase() === walletAddress.toLowerCase()) {
             userCapsules.push(capsule)
           }
         }
