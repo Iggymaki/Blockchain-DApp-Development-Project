@@ -80,7 +80,30 @@ function ProfileModal({ walletAddress, provider, signer, onClose }) {
 
   useEffect(() => {
     loadCapsules()
-  }, [loadCapsules])
+
+    // ─── Real-time Event Listeners ───
+    if (!provider && !signer) return
+    const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer || provider)
+
+    const onCapsuleUpdate = (id, creator) => {
+      // Refresh only if the capsule belongs to the current user
+      if (creator && walletAddress && creator.toLowerCase() === walletAddress.toLowerCase()) {
+        loadCapsules()
+      } else if (!creator) {
+        // Fallback for events that might not return creator easily
+        loadCapsules()
+      }
+    }
+
+    contract.on('CapsuleCreated', onCapsuleUpdate)
+    // If the contract has a CapsuleOpened event (optional):
+    // contract.on('CapsuleOpened', onCapsuleUpdate)
+
+    return () => {
+      contract.off('CapsuleCreated', onCapsuleUpdate)
+      // contract.off('CapsuleOpened', onCapsuleUpdate)
+    }
+  }, [loadCapsules, provider, signer, walletAddress])
 
   // ─── Copy Capsule ID ───
   const copyId = async (id) => {
@@ -130,7 +153,17 @@ function ProfileModal({ walletAddress, provider, signer, onClose }) {
         {/* ─── Modal Header ─── */}
         <div className="profile-header">
           <div>
-            <div className="profile-header-label">My Profile</div>
+            <div className="profile-header-label">
+              My Profile
+              <button 
+                onClick={loadCapsules} 
+                className="btn-refresh" 
+                title="Refresh History"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '8px', fontSize: '1rem', color: 'var(--text-muted)' }}
+              >
+                🔄
+              </button>
+            </div>
             <h2 className="profile-title">Capsule History</h2>
             <p className="profile-address">
               <span className="wallet-dot" style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'middle' }} />

@@ -56,6 +56,14 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
     }
   }
 
+  // ─── ตัดการเชื่อมต่อ Wallet (Logout) ───
+  const disconnectWallet = () => {
+    setWalletAddress(null)
+    setProvider(null)
+    setSigner(null)
+    showNotification('info', '👋 Disconnected', 'กระเป๋าของคุณถูกตัดการเชื่อมต่อจากระบบแล้ว')
+  }
+
   // ─── Smooth scroll navigation ───
   const scrollTo = (id) => {
     const el = document.getElementById(id)
@@ -87,13 +95,24 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
       <div className="navbar-actions">
         {/* My Profile — visible only when wallet is connected */}
         {walletAddress && (
-          <button
-            id="btn-my-profile"
-            className="btn-profile"
-            onClick={onOpenProfile}
-          >
-            👤 My Profile
-          </button>
+          <>
+            <button
+              id="btn-my-profile"
+              className="btn-profile"
+              onClick={onOpenProfile}
+            >
+              👤 My Profile
+            </button>
+            <button
+              id="btn-logout"
+              className="btn-profile logout-btn"
+              onClick={disconnectWallet}
+              title="Disconnect Wallet"
+              style={{ padding: '0.55rem 0.8rem' }}
+            >
+              🔌 Logout
+            </button>
+          </>
         )}
 
         {/* Connect Wallet */}
