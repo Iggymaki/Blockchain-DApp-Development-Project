@@ -8,6 +8,18 @@
 function HeroSection() {
   return (
     <section className="hero-section">
+      {/* Full-width Video Background */}
+      <video
+        className="hero-video-bg"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260815_040604_df64d7a1-0e23-4720-b69d-a1a1edcbb237.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      {/* Overlay to ensure text readability against the video */}
+      <div className="hero-video-overlay" />
+
       {/* Decorative scattered postal elements */}
       <div className="hero-decorations">
         <span className="deco-stamp">✉️</span>
