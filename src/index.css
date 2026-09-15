@@ -284,6 +284,12 @@ body {
   border-color: var(--color-olive);
 }
 
+.metamask-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 .wallet-dot {
   width: 7px;
   height: 7px;
