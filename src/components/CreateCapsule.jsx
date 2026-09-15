@@ -1,10 +1,8 @@
 // =============================================================
-// 🔒 CreateCapsule.jsx - Create Time Capsule Form
+// 🔒 CreateCapsule.jsx - "Seal a New Memory" Form
 // =============================================================
-// ฟอร์มสำหรับสร้างแคปซูลกาลเวลาใหม่
-// - กรอกข้อความลับ (Message)
-// - ตั้งเวลาล็อค (Delay in seconds)
-// - ส่ง Transaction ผ่าน Smart Contract
+// ฟอร์มสร้างแคปซูลสไตล์โปสการ์ดวินเทจ
+// พร้อมเอฟเฟกต์กระดาษเส้นและ stamp ตกแต่ง
 // =============================================================
 
 import { useState } from 'react'
@@ -45,23 +43,23 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
     setTxStatus(null)
 
     try {
-      // สร้าง Contract Instance ด้วย Signer (เพื่อส่ง Transaction)
+      // สร้าง Contract Instance ด้วย Signer
       const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 
       // เรียกฟังก์ชัน createCapsule บน Smart Contract
-      setTxStatus({ type: 'info', text: '📡 กำลังส่ง Transaction...' })
+      setTxStatus({ type: 'info', text: '📡 Sending transaction to the blockchain...' })
       const tx = await contract.createCapsule(message, BigInt(lockDuration))
 
-      // รอ Transaction ถูก Confirm บน Blockchain
-      setTxStatus({ type: 'info', text: '⛏️ กำลังรอ Confirmation...' })
+      // รอ Transaction ถูก Confirm
+      setTxStatus({ type: 'info', text: '⛏️ Awaiting confirmation on Sepolia...' })
       await tx.wait()
 
       // สำเร็จ!
-      setTxStatus({ type: 'success', text: '✅ สร้างแคปซูลสำเร็จ!' })
+      setTxStatus({ type: 'success', text: '✅ Your time capsule has been sealed!' })
       showNotification(
         'success',
-        '🎉 Capsule Created!',
-        `แคปซูลถูกสร้างเรียบร้อยแล้ว! ข้อความจะถูกล็อคไว้ ${lockDuration} วินาที`
+        '🎉 Memory Sealed!',
+        `Your secret has been locked away for ${lockDuration} seconds. It now lives immutably on the blockchain.`
       )
 
       // เคลียร์ฟอร์ม
@@ -69,11 +67,11 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
       setLockDuration('')
     } catch (error) {
       console.error('Create capsule error:', error)
-      setTxStatus({ type: 'error', text: '❌ Transaction ล้มเหลว' })
+      setTxStatus({ type: 'error', text: '❌ Transaction failed' })
       showNotification(
         'error',
-        '❌ Transaction Failed',
-        error?.reason || error?.message || 'เกิดข้อผิดพลาดในการสร้างแคปซูล กรุณาลองใหม่'
+        '❌ Sealing Failed',
+        error?.reason || error?.message || 'Something went wrong while sealing your capsule. Please try again.'
       )
     } finally {
       setIsLoading(false)
@@ -81,42 +79,45 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
   }
 
   return (
-    <section className="glass-card" id="create-capsule-section">
+    <section className="vintage-card" id="create-capsule-section">
+      {/* Decorative stamp in corner */}
+      <div className="card-stamp">🔒</div>
+
       {/* ─── Card Header ─── */}
       <div className="card-header">
-        <div className="card-icon">🔒</div>
-        <div>
-          <h2 className="card-title">Create Capsule</h2>
-          <p className="card-subtitle">สร้างแคปซูลกาลเวลาใหม่</p>
-        </div>
+        <div className="card-header-label">Section I</div>
+        <h2 className="card-title">Seal a New Memory</h2>
+        <p className="card-subtitle">Write your secret and lock it in time</p>
       </div>
 
-      {/* ─── Message Input ─── */}
+      {/* ─── Message Input (lined paper) ─── */}
       <div className="form-group">
         <label className="form-label" htmlFor="input-message">
-          💬 Secret Message (ข้อความลับ)
+          Secret Message
+          <span className="form-label-hint">— your words, preserved forever</span>
         </label>
         <textarea
           id="input-message"
           className="form-input textarea"
-          placeholder="พิมพ์ข้อความลับที่ต้องการเก็บ..."
+          placeholder="Dear future self..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           disabled={isLoading}
-          rows={3}
+          rows={4}
         />
       </div>
 
       {/* ─── Lock Duration Input ─── */}
       <div className="form-group">
         <label className="form-label" htmlFor="input-duration">
-          ⏱️ Lock Duration (ระยะเวลาล็อค - วินาที)
+          Unlock Delay
+          <span className="form-label-hint">— in seconds (60 = 1 min, 3600 = 1 hr)</span>
         </label>
         <input
           id="input-duration"
           className="form-input"
           type="number"
-          placeholder="เช่น 60 = 1 นาที, 3600 = 1 ชั่วโมง"
+          placeholder="e.g. 120"
           value={lockDuration}
           onChange={(e) => setLockDuration(e.target.value)}
           disabled={isLoading}
@@ -134,7 +135,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
         {isLoading ? (
           <>
             <div className="loading-spinner" />
-            Processing...
+            Sealing your memory...
           </>
         ) : (
           <>🔐 Lock in Time Capsule</>

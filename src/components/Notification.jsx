@@ -1,7 +1,7 @@
 // =============================================================
-// 🔔 Notification.jsx - Popup Notification Modal
+// 🔔 Notification.jsx - Vintage Telegram Modal
 // =============================================================
-// Popup แจ้งเตือนแบบ Overlay สำหรับแสดงสถานะต่างๆ
+// Popup แจ้งเตือนสไตล์โทรเลขวินเทจ
 // Types: success, error, locked, info
 // =============================================================
 
@@ -10,7 +10,7 @@ function Notification({ type, title, message, onDismiss }) {
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return '🎉'
+        return '📬'
       case 'error':
         return '⚠️'
       case 'locked':
@@ -18,19 +18,18 @@ function Notification({ type, title, message, onDismiss }) {
       case 'info':
         return 'ℹ️'
       default:
-        return '💬'
+        return '✉️'
     }
   }
 
-  // ─── ตรวจสอบว่ามีข้อความที่ถูกเปิดเผย (revealed text) หรือไม่ ───
+  // ─── Render message — handle <revealed> tag ───
   const renderMessage = () => {
-    // ตรวจหา tag <revealed>...</revealed> สำหรับแสดงข้อความลับ
     const revealedMatch = message.match(/<revealed>(.*?)<\/revealed>/s)
 
     if (revealedMatch) {
       return (
         <div className="notification-message">
-          <span>ข้อความลับของคุณคือ:</span>
+          <span>Your sealed message reads:</span>
           <span className="revealed-text">"{revealedMatch[1]}"</span>
         </div>
       )
@@ -53,7 +52,7 @@ function Notification({ type, title, message, onDismiss }) {
           onClick={onDismiss}
           id="btn-dismiss-notification"
         >
-          OK, Got it ✨
+          Understood ✦
         </button>
       </div>
     </div>

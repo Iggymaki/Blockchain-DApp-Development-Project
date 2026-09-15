@@ -1,8 +1,8 @@
 // =============================================================
-// 🧭 Navbar.jsx - Navigation Bar + Wallet Connect
+// 🧭 Navbar.jsx - Vintage Postal Navigation & Wallet Connect
 // =============================================================
-// แถบนำทางด้านบน พร้อมปุ่ม Connect Wallet (MetaMask)
-// ใช้ ethers.js v6 BrowserProvider สำหรับเชื่อมต่อ
+// แถบนำทางสไตล์จดหมายวินเทจ พร้อมเมนู pill-shaped
+// และปุ่ม Connect Wallet แบบ stamp / tag
 // =============================================================
 
 import { useState } from 'react'
@@ -11,8 +11,7 @@ import { BrowserProvider } from 'ethers'
 function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showNotification }) {
   const [isConnecting, setIsConnecting] = useState(false)
 
-  // ─── ฟังก์ชันย่อ Address ให้สั้นลง ───
-  // เช่น 0x1234567890ABCDEF... → 0x1234...CDEF
+  // ─── ย่อ Address ───
   const shortenAddress = (address) => {
     if (!address) return ''
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -20,7 +19,6 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
 
   // ─── เชื่อมต่อ MetaMask Wallet ───
   const connectWallet = async () => {
-    // ตรวจสอบว่ามี MetaMask ติดตั้งหรือไม่
     if (!window.ethereum) {
       showNotification(
         'error',
@@ -33,24 +31,18 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
     setIsConnecting(true)
 
     try {
-      // สร้าง Provider จาก MetaMask (ethers.js v6)
       const browserProvider = new BrowserProvider(window.ethereum)
-
-      // ขอ Permission เข้าถึง Accounts
       const accounts = await browserProvider.send('eth_requestAccounts', [])
-
-      // ดึง Signer สำหรับส่ง Transaction
       const walletSigner = await browserProvider.getSigner()
 
-      // อัปเดต State
       setProvider(browserProvider)
       setSigner(walletSigner)
       setWalletAddress(accounts[0])
 
       showNotification(
         'success',
-        '✅ Connected!',
-        `เชื่อมต่อ Wallet สำเร็จ: ${shortenAddress(accounts[0])}`
+        '✅ Wallet Connected',
+        `เชื่อมต่อสำเร็จ: ${shortenAddress(accounts[0])}`
       )
     } catch (error) {
       console.error('Wallet connection error:', error)
@@ -64,15 +56,31 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
     }
   }
 
+  // ─── Smooth scroll navigation ───
+  const scrollTo = (id) => {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <nav className="navbar">
       {/* ─── Brand / Logo ─── */}
       <div className="navbar-brand">
-        <div className="navbar-logo">⏳</div>
+        <div className="navbar-logo">✉️</div>
         <div>
-          <div className="navbar-title">Time Capsule</div>
-          <div className="navbar-subtitle">Blockchain DApp</div>
+          <div className="navbar-title">TimeLock</div>
+          <div className="navbar-subtitle">Digital Time Capsule</div>
         </div>
+      </div>
+
+      {/* ─── Navigation Pills ─── */}
+      <div className="navbar-menu">
+        <button className="nav-pill" onClick={() => scrollTo('create-capsule-section')}>
+          Seal
+        </button>
+        <button className="nav-pill" onClick={() => scrollTo('open-capsule-section')}>
+          Open
+        </button>
       </div>
 
       {/* ─── Connect Wallet Button ─── */}

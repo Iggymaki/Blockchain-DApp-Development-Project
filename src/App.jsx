@@ -1,8 +1,8 @@
 // =============================================================
 // 🏗️ App.jsx - Main Application Component
 // =============================================================
-// Digital Time Capsule DApp - คอมโพเนนต์หลักของแอปพลิเคชัน
-// รวมทุก Component และจัดการ State กลาง
+// TimeLock: Digital Time Capsule DApp
+// Vintage Scrapbook & Postal Aesthetic
 // =============================================================
 
 import { useState, useCallback } from 'react'
@@ -11,11 +11,10 @@ import HeroSection from './components/HeroSection.jsx'
 import CreateCapsule from './components/CreateCapsule.jsx'
 import OpenCapsule from './components/OpenCapsule.jsx'
 import Notification from './components/Notification.jsx'
-import StarBackground from './components/StarBackground.jsx'
+import VintageParticles from './components/StarBackground.jsx'
 
 function App() {
   // ─── State Management ───
-  // สถานะ Wallet (MetaMask)
   const [walletAddress, setWalletAddress] = useState(null)
   const [provider, setProvider] = useState(null)
   const [signer, setSigner] = useState(null)
@@ -24,7 +23,6 @@ function App() {
   const [notification, setNotification] = useState(null)
 
   // ─── Notification Helper ───
-  // ฟังก์ชันสำหรับแสดงข้อความแจ้งเตือน (popup)
   const showNotification = useCallback((type, title, message) => {
     setNotification({ type, title, message })
   }, [])
@@ -35,9 +33,9 @@ function App() {
 
   return (
     <>
-      {/* พื้นหลังแบบ Gradient + Animated Orbs */}
+      {/* Vintage paper texture background */}
       <div className="app-background" />
-      <StarBackground />
+      <VintageParticles />
 
       <div className="app-container">
         {/* ─── Navigation Bar ─── */}
@@ -49,19 +47,24 @@ function App() {
           showNotification={showNotification}
         />
 
-        {/* ─── Hero Section (หัวข้อหลัก) ─── */}
+        {/* ─── Hero Section ─── */}
         <HeroSection />
+
+        {/* ─── Section Label ─── */}
+        <div className="section-label">
+          <span className="section-label-text">Your Time Capsules</span>
+        </div>
 
         {/* ─── Main Content (2-column grid) ─── */}
         <main className="main-content">
-          {/* ฝั่งซ้าย: สร้างแคปซูล */}
+          {/* Left: Seal a New Memory */}
           <CreateCapsule
             signer={signer}
             walletAddress={walletAddress}
             showNotification={showNotification}
           />
 
-          {/* ฝั่งขวา: เปิดแคปซูล */}
+          {/* Right: Open Your Capsule */}
           <OpenCapsule
             signer={signer}
             provider={provider}
@@ -72,8 +75,11 @@ function App() {
 
         {/* ─── Footer ─── */}
         <footer className="app-footer">
-          <p>
-            ⛓️ Digital Time Capsule — Built with React + ethers.js on Ethereum
+          <p className="footer-text">
+            TimeLock — Built with React & ethers.js on Ethereum Sepolia
+          </p>
+          <p className="footer-address">
+            Contract: 0x6478C759CEe955d2A7FEf41736c5e9C53B1378c0
           </p>
         </footer>
       </div>
