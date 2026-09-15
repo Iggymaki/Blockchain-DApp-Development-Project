@@ -11,6 +11,7 @@ import HeroSection from './components/HeroSection.jsx'
 import CreateCapsule from './components/CreateCapsule.jsx'
 import OpenCapsule from './components/OpenCapsule.jsx'
 import Notification from './components/Notification.jsx'
+import ProfileModal from './components/ProfileModal.jsx'
 import VintageParticles from './components/StarBackground.jsx'
 
 function App() {
@@ -21,6 +22,9 @@ function App() {
 
   // สถานะ Notification Popup
   const [notification, setNotification] = useState(null)
+
+  // สถานะ Profile Modal
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   // ─── Notification Helper ───
   const showNotification = useCallback((type, title, message) => {
@@ -45,6 +49,7 @@ function App() {
           setProvider={setProvider}
           setSigner={setSigner}
           showNotification={showNotification}
+          onOpenProfile={() => setIsProfileOpen(true)}
         />
 
         {/* ─── Hero Section ─── */}
@@ -83,6 +88,16 @@ function App() {
           </p>
         </footer>
       </div>
+
+      {/* ─── Profile Modal ─── */}
+      {isProfileOpen && walletAddress && (
+        <ProfileModal
+          walletAddress={walletAddress}
+          provider={provider}
+          signer={signer}
+          onClose={() => setIsProfileOpen(false)}
+        />
+      )}
 
       {/* ─── Notification Popup Overlay ─── */}
       {notification && (

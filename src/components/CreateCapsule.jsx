@@ -2,40 +2,101 @@
 // 🔒 CreateCapsule.jsx - "Seal a New Memory" Form
 // =============================================================
 // ฟอร์มสร้างแคปซูลสไตล์โปสการ์ดวินเทจ
-// พร้อมเอฟเฟกต์กระดาษเส้นและ stamp ตกแต่ง
+// พร้อม Tab System: Quick Timer / Calendar & Time
 // =============================================================
 
 import { useState } from 'react'
 import { Contract } from 'ethers'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contracts/config.js'
 
+// ─── Preset Timer Durations ───
+const PRESET_DURATIONS = [
+  { label: '1 min', seconds: 60 },
+  { label: '5 min', seconds: 300 },
+  { label: '10 min', seconds: 600 },
+  { label: '1 hr', seconds: 3600 },
+  { label: '3 hrs', seconds: 10800 },
+  { label: '5 hrs', seconds: 18000 },
+  { label: '7 hrs', seconds: 25200 },
+  { label: '9 hrs', seconds: 32400 },
+  { label: '11 hrs', seconds: 39600 },
+  { label: '13 hrs', seconds: 46800 },
+  { label: '15 hrs', seconds: 54000 },
+  { label: '17 hrs', seconds: 61200 },
+  { label: '19 hrs', seconds: 68400 },
+  { label: '21 hrs', seconds: 75600 },
+  { label: '24 hrs', seconds: 86400 },
+]
+
 function CreateCapsule({ signer, walletAddress, showNotification }) {
   // ─── Local State ───
   const [message, setMessage] = useState('')
-  const [lockDuration, setLockDuration] = useState('')
+  const [delayMode, setDelayMode] = useState('timer') // 'timer' | 'calendar'
+  const [selectedPreset, setSelectedPreset] = useState(null) // seconds from preset
+  const [targetDateTime, setTargetDateTime] = useState('') // datetime-local value
   const [isLoading, setIsLoading] = useState(false)
   const [txStatus, setTxStatus] = useState(null)
 
+  // ─── คำนวณจำนวนวินาทีจากโหมดที่เลือก ───
+  const getDelaySeconds = () => {
+    if (delayMode === 'timer') {
+      return selectedPreset
+    }
+
+    if (delayMode === 'calendar' && targetDateTime) {
+      const targetTimestamp = Math.floor(new Date(targetDateTime).getTime() / 1000)
+      const currentTimestamp = Math.floor(Date.now() / 1000)
+      const diff = targetTimestamp - currentTimestamp
+      return diff > 0 ? diff : null
+    }
+
+    return null
+  }
+
+  // ─── แสดงสรุปเวลาที่เลือก ───
+  const getDelaySummary = () => {
+    const seconds = getDelaySeconds()
+    if (!seconds) return null
+
+    if (seconds < 3600) {
+      return `${Math.floor(seconds / 60)} minute${Math.floor(seconds / 60) !== 1 ? 's' : ''}`
+    }
+    if (seconds < 86400) {
+      const hrs = Math.floor(seconds / 3600)
+      const mins = Math.floor((seconds % 3600) / 60)
+      return mins > 0 ? `${hrs} hr${hrs !== 1 ? 's' : ''} ${mins} min` : `${hrs} hr${hrs !== 1 ? 's' : ''}`
+    }
+    const days = Math.floor(seconds / 86400)
+    const hrs = Math.floor((seconds % 86400) / 3600)
+    return hrs > 0 ? `${days} day${days !== 1 ? 's' : ''} ${hrs} hr${hrs !== 1 ? 's' : ''}` : `${days} day${days !== 1 ? 's' : ''}`
+  }
+
+  // ─── คำนวณ minimum datetime สำหรับ calendar picker ───
+  const getMinDateTime = () => {
+    const now = new Date()
+    now.setMinutes(now.getMinutes() + 1) // อย่างน้อย 1 นาทีจากตอนนี้
+    return now.toISOString().slice(0, 16)
+  }
+
   // ─── ส่ง Transaction สร้างแคปซูล ───
   const handleCreateCapsule = async () => {
-    // ตรวจสอบว่าเชื่อมต่อ Wallet แล้วหรือยัง
     if (!walletAddress) {
-      showNotification(
-        'error',
-        '🔗 Wallet Required',
-        'กรุณาเชื่อมต่อ MetaMask ก่อนสร้างแคปซูล'
-      )
+      showNotification('error', '🔗 Wallet Required', 'กรุณาเชื่อมต่อ MetaMask ก่อนสร้างแคปซูล')
       return
     }
 
-    // ตรวจสอบ Input
     if (!message.trim()) {
       showNotification('error', '📝 Missing Message', 'กรุณากรอกข้อความลับที่ต้องการเก็บ')
       return
     }
 
-    if (!lockDuration || Number(lockDuration) <= 0) {
-      showNotification('error', '⏱️ Invalid Duration', 'กรุณาระบุจำนวนวินาทีที่ต้องการล็อค (มากกว่า 0)')
+    const delaySeconds = getDelaySeconds()
+    if (!delaySeconds || delaySeconds <= 0) {
+      if (delayMode === 'calendar') {
+        showNotification('error', '📅 Invalid Date', 'กรุณาเลือกวันเวลาที่อยู่ในอนาคต')
+      } else {
+        showNotification('error', '⏱️ No Duration Selected', 'กรุณาเลือกระยะเวลาล็อคที่ต้องการ')
+      }
       return
     }
 
@@ -43,28 +104,26 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
     setTxStatus(null)
 
     try {
-      // สร้าง Contract Instance ด้วย Signer
       const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 
-      // เรียกฟังก์ชัน createCapsule บน Smart Contract
       setTxStatus({ type: 'info', text: '📡 Sending transaction to the blockchain...' })
-      const tx = await contract.createCapsule(message, BigInt(lockDuration))
+      const tx = await contract.createCapsule(message, BigInt(delaySeconds))
 
-      // รอ Transaction ถูก Confirm
       setTxStatus({ type: 'info', text: '⛏️ Awaiting confirmation on Sepolia...' })
       await tx.wait()
 
-      // สำเร็จ!
+      const summary = getDelaySummary()
       setTxStatus({ type: 'success', text: '✅ Your time capsule has been sealed!' })
       showNotification(
         'success',
         '🎉 Memory Sealed!',
-        `Your secret has been locked away for ${lockDuration} seconds. It now lives immutably on the blockchain.`
+        `Your secret has been locked for ${summary}. It now lives immutably on the blockchain.`
       )
 
-      // เคลียร์ฟอร์ม
+      // Reset form
       setMessage('')
-      setLockDuration('')
+      setSelectedPreset(null)
+      setTargetDateTime('')
     } catch (error) {
       console.error('Create capsule error:', error)
       setTxStatus({ type: 'error', text: '❌ Transaction failed' })
@@ -77,6 +136,8 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
       setIsLoading(false)
     }
   }
+
+  const delaySummary = getDelaySummary()
 
   return (
     <section className="vintage-card" id="create-capsule-section">
@@ -107,22 +168,75 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
         />
       </div>
 
-      {/* ─── Lock Duration Input ─── */}
+      {/* ─── Unlock Delay — Tab System ─── */}
       <div className="form-group">
-        <label className="form-label" htmlFor="input-duration">
+        <label className="form-label">
           Unlock Delay
-          <span className="form-label-hint">— in seconds (60 = 1 min, 3600 = 1 hr)</span>
+          <span className="form-label-hint">— choose when to unseal</span>
         </label>
-        <input
-          id="input-duration"
-          className="form-input"
-          type="number"
-          placeholder="e.g. 120"
-          value={lockDuration}
-          onChange={(e) => setLockDuration(e.target.value)}
-          disabled={isLoading}
-          min="1"
-        />
+
+        {/* Tab Switcher */}
+        <div className="delay-tabs">
+          <button
+            type="button"
+            className={`delay-tab ${delayMode === 'timer' ? 'active' : ''}`}
+            onClick={() => setDelayMode('timer')}
+            disabled={isLoading}
+          >
+            ⏱️ Quick Timer
+          </button>
+          <button
+            type="button"
+            className={`delay-tab ${delayMode === 'calendar' ? 'active' : ''}`}
+            onClick={() => setDelayMode('calendar')}
+            disabled={isLoading}
+          >
+            📅 Calendar & Time
+          </button>
+        </div>
+
+        {/* Tab Content: Quick Timer */}
+        {delayMode === 'timer' && (
+          <div className="delay-panel">
+            <div className="preset-grid">
+              {PRESET_DURATIONS.map((preset) => (
+                <button
+                  key={preset.seconds}
+                  type="button"
+                  className={`preset-chip ${selectedPreset === preset.seconds ? 'active' : ''}`}
+                  onClick={() => setSelectedPreset(preset.seconds)}
+                  disabled={isLoading}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab Content: Calendar & Time */}
+        {delayMode === 'calendar' && (
+          <div className="delay-panel">
+            <p className="calendar-hint">
+              Pick the exact date & time to unseal your capsule:
+            </p>
+            <input
+              type="datetime-local"
+              className="form-input calendar-input"
+              value={targetDateTime}
+              onChange={(e) => setTargetDateTime(e.target.value)}
+              min={getMinDateTime()}
+              disabled={isLoading}
+            />
+          </div>
+        )}
+
+        {/* Selected Delay Summary */}
+        {delaySummary && (
+          <div className="delay-summary">
+            🕰️ Lock duration: <strong>{delaySummary}</strong>
+          </div>
+        )}
       </div>
 
       {/* ─── Submit Button ─── */}

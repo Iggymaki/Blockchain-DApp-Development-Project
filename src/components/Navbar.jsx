@@ -2,13 +2,13 @@
 // 🧭 Navbar.jsx - Vintage Postal Navigation & Wallet Connect
 // =============================================================
 // แถบนำทางสไตล์จดหมายวินเทจ พร้อมเมนู pill-shaped
-// และปุ่ม Connect Wallet แบบ stamp / tag
+// ปุ่ม Connect Wallet และปุ่ม My Profile
 // =============================================================
 
 import { useState } from 'react'
 import { BrowserProvider } from 'ethers'
 
-function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showNotification }) {
+function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showNotification, onOpenProfile }) {
   const [isConnecting, setIsConnecting] = useState(false)
 
   // ─── ย่อ Address ───
@@ -83,29 +83,43 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
         </button>
       </div>
 
-      {/* ─── Connect Wallet Button ─── */}
-      <button
-        id="btn-connect-wallet"
-        className={`btn-connect ${walletAddress ? 'connected' : ''}`}
-        onClick={connectWallet}
-        disabled={isConnecting}
-      >
-        {isConnecting ? (
-          <>
-            <div className="loading-spinner" />
-            <span>Connecting...</span>
-          </>
-        ) : walletAddress ? (
-          <>
-            <div className="wallet-dot" />
-            <span>{shortenAddress(walletAddress)}</span>
-          </>
-        ) : (
-          <>
-            🦊 <span>Connect Wallet</span>
-          </>
+      {/* ─── Right Actions: Profile + Connect Wallet ─── */}
+      <div className="navbar-actions">
+        {/* My Profile — visible only when wallet is connected */}
+        {walletAddress && (
+          <button
+            id="btn-my-profile"
+            className="btn-profile"
+            onClick={onOpenProfile}
+          >
+            👤 My Profile
+          </button>
         )}
-      </button>
+
+        {/* Connect Wallet */}
+        <button
+          id="btn-connect-wallet"
+          className={`btn-connect ${walletAddress ? 'connected' : ''}`}
+          onClick={connectWallet}
+          disabled={isConnecting}
+        >
+          {isConnecting ? (
+            <>
+              <div className="loading-spinner" />
+              <span>Connecting...</span>
+            </>
+          ) : walletAddress ? (
+            <>
+              <div className="wallet-dot" />
+              <span>{shortenAddress(walletAddress)}</span>
+            </>
+          ) : (
+            <>
+              🦊 <span>Connect Wallet</span>
+            </>
+          )}
+        </button>
+      </div>
     </nav>
   )
 }
