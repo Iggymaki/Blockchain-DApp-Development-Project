@@ -290,6 +290,14 @@ body {
   object-fit: contain;
 }
 
+.metamask-logo-small {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .wallet-dot {
   width: 7px;
   height: 7px;

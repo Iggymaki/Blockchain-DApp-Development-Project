@@ -135,7 +135,7 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
             </>
           ) : walletAddress ? (
             <>
-              <div className="wallet-dot" />
+              <img src="/metamask-logo.png" alt="MetaMask" className="metamask-logo-small" />
               <span>{shortenAddress(walletAddress)}</span>
             </>
           ) : (
