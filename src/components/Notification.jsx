@@ -15,7 +15,13 @@ function Notification({ type, title, message, onDismiss }) {
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return '📬'
+        return (
+          <img
+            src="/metamask-logo.png"
+            alt="MetaMask"
+            className="notification-metamask-logo"
+          />
+        )
       case 'error':
         return '⚠️'
       case 'locked':
@@ -23,7 +29,13 @@ function Notification({ type, title, message, onDismiss }) {
       case 'info':
         return 'ℹ️'
       default:
-        return '✉️'
+        return (
+          <img
+            src="/metamask-logo.png"
+            alt="MetaMask"
+            className="notification-metamask-logo"
+          />
+        )
     }
   }
 
