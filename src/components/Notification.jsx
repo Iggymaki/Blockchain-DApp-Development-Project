@@ -7,9 +7,19 @@
 // =============================================================
 
 function Notification({ type, title, message, onDismiss }) {
+  // ─── ตรวจสอบว่าเป็นข้อความที่มี Transaction Hash หรือไม่ ───
+  const txMatch = message.match(/<tx>(.*?)<\/tx>/s)
+  const txHash = txMatch ? txMatch[1] : null
+
   // ─── ตรวจสอบว่าเป็นข้อความที่เปิดเผยจาก Capsule หรือไม่ ───
   const revealedMatch = message.match(/<revealed>(.*?)<\/revealed>/s)
   const isRevealed = !!revealedMatch
+
+  // ข้อความหลักโดยลบแท็กพิเศษออก
+  const displayMessage = message
+    .replace(/<tx>(.*?)<\/tx>/s, '')
+    .replace(/<revealed>(.*?)<\/revealed>/s, '')
+    .trim()
 
   // ─── กำหนด Icon ตามประเภท ───
   const getIcon = () => {
@@ -88,7 +98,23 @@ function Notification({ type, title, message, onDismiss }) {
       >
         <div className="notification-icon">{getIcon()}</div>
         <h3 className="notification-title">{title}</h3>
-        <p className="notification-message">{message}</p>
+        <p className="notification-message">{displayMessage}</p>
+
+        {txHash && (
+          <div className="notification-tx-box">
+            <span className="notification-tx-label">Transaction ID:</span>{' '}
+            <a
+              href={`https://sepolia.etherscan.io/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="notification-tx-hash"
+              title="View on Sepolia Etherscan"
+            >
+              {txHash.slice(0, 10)}...{txHash.slice(-8)} ↗
+            </a>
+          </div>
+        )}
+
         <button
           className="btn-dismiss"
           onClick={onDismiss}

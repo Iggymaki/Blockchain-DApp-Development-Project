@@ -119,7 +119,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
       showNotification(
         'success',
         '🎉 Memory Sealed!',
-        `Your secret has been locked for ${summary}. It now lives immutably on the blockchain.`
+        `Your secret has been locked for ${summary}. It now lives immutably on the blockchain.<tx>${tx.hash}</tx>`
       )
 
       // Reset form
