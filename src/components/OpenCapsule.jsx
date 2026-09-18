@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { Contract } from 'ethers'
+import { Unlock } from 'lucide-react'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contracts/config.js'
 
 function OpenCapsule({ signer, provider, walletAddress, showNotification }) {
@@ -94,7 +95,7 @@ function OpenCapsule({ signer, provider, walletAddress, showNotification }) {
   return (
     <section className="vintage-card" id="open-capsule-section">
       {/* Decorative stamp in corner */}
-      <div className="card-stamp">🔓</div>
+      <div className="card-stamp"><Unlock size={24} strokeWidth={1.5} /></div>
 
       {/* ─── Card Header ─── */}
       <div className="card-header">
@@ -134,7 +135,7 @@ function OpenCapsule({ signer, provider, walletAddress, showNotification }) {
             Unsealing...
           </>
         ) : (
-          <>🔓 Open Time Capsule</>
+          <><Unlock size={18} strokeWidth={2} /> Open Time Capsule</>
         )}
       </button>
 
@@ -145,10 +146,10 @@ function OpenCapsule({ signer, provider, walletAddress, showNotification }) {
         </div>
       )}
 
-      {/* ─── Revealed Message (Opened Letter Display) ─── */}
+      {/* ─── Revealed Message (simple inline display) ─── */}
       {revealedMessage && (
-        <div className="revealed-letter">
-          <p className="revealed-letter-text">{revealedMessage}</p>
+        <div className="revealed-letter-inline">
+          <p className="revealed-letter-inline-text">"{revealedMessage}"</p>
         </div>
       )}
     </section>

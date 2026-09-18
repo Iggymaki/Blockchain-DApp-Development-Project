@@ -32,6 +32,12 @@ function Navbar({ walletAddress, setWalletAddress, setProvider, setSigner, showN
 
     try {
       const browserProvider = new BrowserProvider(window.ethereum)
+      
+      // บังคับให้ MetaMask ถามยืนยันการเชื่อมต่อทุกครั้ง
+      await browserProvider.send('wallet_requestPermissions', [
+        { eth_accounts: {} }
+      ])
+      
       const accounts = await browserProvider.send('eth_requestAccounts', [])
       const walletSigner = await browserProvider.getSigner()
 

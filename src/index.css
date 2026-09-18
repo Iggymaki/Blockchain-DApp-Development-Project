@@ -374,7 +374,7 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: var(--space-xl);
   position: relative;
 }
@@ -410,6 +410,7 @@ body {
   line-height: 1.15;
   letter-spacing: -0.01em;
   margin-bottom: var(--space-md);
+  animation: fadeSlideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .hero-title-accent {
@@ -426,6 +427,7 @@ body {
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.8;
+  animation: fadeSlideIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
 }
 
 .hero-divider {
@@ -461,6 +463,14 @@ body {
   font-size: 1.3rem;
   opacity: 0.12;
   transform: rotate(-15deg);
+  transition: all var(--transition-slow);
+  cursor: default;
+}
+
+.deco-stamp:hover {
+  opacity: 0.4;
+  transform: scale(1.15) rotate(0deg) !important;
+  z-index: 10;
 }
 
 .deco-stamp:nth-child(1) {
@@ -523,7 +533,8 @@ body {
 
 .vintage-card:hover {
   box-shadow: var(--shadow-elevated);
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--color-mink);
 }
 
 /* Corner fold decoration */
@@ -703,7 +714,24 @@ body {
 .btn-primary:hover:not(:disabled) {
   background: var(--text-heading);
   box-shadow: var(--shadow-card);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-25deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.btn-primary:hover:not(:disabled)::before {
+  left: 150%;
 }
 
 .btn-primary:active:not(:disabled) {
@@ -751,62 +779,194 @@ body {
 
 
 /* ================================================================
-   REVEALED MESSAGE — Opened Letter Display
+   ENVELOPE — Letter Opening Animation
    ================================================================ */
-.revealed-letter {
-  margin-top: var(--space-lg);
-  padding: var(--space-xl);
-  background: var(--bg-card-alt);
-  border: 1px solid var(--color-dusk);
-  border-radius: var(--radius-md);
+.envelope-wrapper {
+  margin-top: var(--space-xl);
+  display: flex;
+  justify-content: center;
+  perspective: 800px;
+  animation: fadeIn 0.3s ease;
+}
+
+.envelope {
   position: relative;
-  animation: fadeSlideIn 0.5s ease;
+  width: 100%;
+  max-width: 340px;
+  /* Enough room for letter to peek + envelope body */
+  padding-top: 160px; /* space for letter to slide into */
 }
 
-.revealed-letter::before {
-  content: '— Opened Letter —';
+/* ─── Envelope Flap (triangle lid) ─── */
+.envelope-flap {
   position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-card);
-  padding: 0 var(--space-md);
-  font-family: var(--font-heading);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  top: 160px; /* sits at top of envelope body */
+  left: 0;
+  right: 0;
+  height: 0;
+  border-left: 170px solid transparent;
+  border-right: 170px solid transparent;
+  border-top: 90px solid var(--color-mink);
+  z-index: 4;
+  transform-origin: top center;
+  animation: openFlap 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
 }
 
-.revealed-letter-text {
+@keyframes openFlap {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-180deg);
+    z-index: 0;
+  }
+}
+
+/* ─── Envelope Body (front pocket) ─── */
+.envelope-body {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: var(--color-dusk);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  z-index: 3; /* sits in front of letter */
+  box-shadow:
+    inset 0 6px 12px rgba(73, 64, 45, 0.08),
+    0 2px 8px rgba(73, 64, 45, 0.12);
+}
+
+/* Decorative address lines on envelope front */
+.envelope-body::before {
+  content: '';
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(73, 64, 45, 0.15) 0px,
+    rgba(73, 64, 45, 0.15) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+}
+
+.envelope-body::after {
+  content: '';
+  position: absolute;
+  top: calc(45% + 14px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(73, 64, 45, 0.12) 0px,
+    rgba(73, 64, 45, 0.12) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+}
+
+/* ─── Inner back wall of envelope (visible behind letter) ─── */
+.envelope::before {
+  content: '';
+  position: absolute;
+  top: 160px;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: var(--color-dusk);
+  filter: brightness(0.88);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  z-index: 0;
+}
+
+/* ─── Letter (slides up from inside envelope) ─── */
+.envelope-letter {
+  position: absolute;
+  bottom: 10px; /* starts inside the envelope */
+  left: 20px;
+  right: 20px;
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 174, 153, 0.35);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  padding: var(--space-lg) var(--space-md);
+  z-index: 2; /* behind envelope-body (z:3), in front of back wall (z:0) */
+  box-shadow: 0 -2px 8px rgba(73, 64, 45, 0.06);
+  animation: slideLetterOut 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both;
+  /* Lined-paper effect */
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 24px,
+    rgba(201, 174, 153, 0.1) 24px,
+    rgba(201, 174, 153, 0.1) 25px
+  );
+}
+
+@keyframes slideLetterOut {
+  0% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  100% {
+    /* Slide up just enough to show the letter content above the envelope */
+    transform: translateY(-150px);
+    opacity: 1;
+  }
+}
+
+/* Letter header decoration */
+.envelope-letter-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px dashed rgba(201, 174, 153, 0.5);
+}
+
+.envelope-letter-seal {
+  font-size: 0.6rem;
+  color: var(--color-rouge);
+}
+
+.envelope-letter-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-coffee);
+}
+
+/* The revealed message text */
+.envelope-letter-text {
   font-family: var(--font-heading);
   font-size: 1.25rem;
+  font-weight: 600;
   font-style: italic;
-  color: var(--text-heading);
+  color: var(--color-coffee);
   text-align: center;
-  line-height: 1.7;
+  line-height: 1.8;
   word-break: break-word;
+  margin: 0;
+  padding: var(--space-sm) 0;
 }
 
-.revealed-letter-text::before {
-  content: '"';
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  color: var(--color-dusk);
-  line-height: 0;
-  vertical-align: -0.35em;
-  margin-right: 0.1em;
-}
-
-.revealed-letter-text::after {
-  content: '"';
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  color: var(--color-dusk);
-  line-height: 0;
-  vertical-align: -0.35em;
-  margin-left: 0.1em;
+/* Footer */
+.envelope-letter-footer {
+  padding-top: var(--space-xs);
+  border-top: 1px dashed rgba(201, 174, 153, 0.5);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: right;
+  font-style: italic;
 }
 
 
@@ -895,6 +1055,65 @@ body {
   border-radius: var(--radius-md);
 }
 
+/* ─── Envelope variant for notification card ─── */
+.notification-card--envelope {
+  max-width: 600px;
+  padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notification-card--envelope .envelope-wrapper {
+  margin-top: 0;
+  width: 100%;
+}
+
+.notification-card--envelope .envelope {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.notification-card--envelope .envelope-flap {
+  border-left-width: 210px;
+  border-right-width: 210px;
+  border-top-width: 100px;
+}
+
+.notification-card--envelope .envelope-body {
+  height: 160px;
+}
+
+.notification-card--envelope .envelope::before {
+  height: 160px;
+}
+
+.notification-card--envelope .envelope-letter {
+  padding: var(--space-xl) var(--space-lg);
+}
+
+/* ─── Inline revealed message (in the OpenCapsule card) ─── */
+.revealed-letter-inline {
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card-alt);
+  border: 1px dashed var(--color-dusk);
+  border-radius: var(--radius-md);
+  text-align: center;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.revealed-letter-inline-text {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--text-heading);
+  line-height: 1.7;
+  word-break: break-word;
+  margin: 0;
+}
+
 .btn-dismiss {
   display: inline-flex;
   align-items: center;
@@ -976,7 +1195,7 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -1204,6 +1423,27 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+}
+
+.btn-expand-timer {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  padding: 4px 0;
+  transition: all var(--transition-fast);
+}
+
+.btn-expand-timer:hover {
+  color: var(--color-coffee);
+  background: rgba(201, 174, 153, 0.1);
+  border-radius: var(--radius-md);
 }
 
 

@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { Contract } from 'ethers'
+import { Lock } from 'lucide-react'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../contracts/config.js'
 
 // ─── Preset Timer Durations ───
@@ -36,6 +37,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
   const [targetDateTime, setTargetDateTime] = useState('') // datetime-local value
   const [isLoading, setIsLoading] = useState(false)
   const [txStatus, setTxStatus] = useState(null)
+  const [isTimerExpanded, setIsTimerExpanded] = useState(false)
 
   // ─── คำนวณจำนวนวินาทีจากโหมดที่เลือก ───
   const getDelaySeconds = () => {
@@ -142,7 +144,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
   return (
     <section className="vintage-card" id="create-capsule-section">
       {/* Decorative stamp in corner */}
-      <div className="card-stamp">🔒</div>
+      <div className="card-stamp"><Lock size={24} strokeWidth={1.5} /></div>
 
       {/* ─── Card Header ─── */}
       <div className="card-header">
@@ -199,7 +201,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
         {delayMode === 'timer' && (
           <div className="delay-panel">
             <div className="preset-grid">
-              {PRESET_DURATIONS.map((preset) => (
+              {(isTimerExpanded ? PRESET_DURATIONS : PRESET_DURATIONS.slice(0, 5)).map((preset) => (
                 <button
                   key={preset.seconds}
                   type="button"
@@ -211,6 +213,13 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
                 </button>
               ))}
             </div>
+            <button 
+              type="button" 
+              className="btn-expand-timer"
+              onClick={() => setIsTimerExpanded(!isTimerExpanded)}
+            >
+              {isTimerExpanded ? '↑ Less Options' : '↓ More Options'}
+            </button>
           </div>
         )}
 
@@ -252,7 +261,7 @@ function CreateCapsule({ signer, walletAddress, showNotification }) {
             Sealing your memory...
           </>
         ) : (
-          <>🔐 Lock in Time Capsule</>
+          <><Lock size={18} strokeWidth={2} /> Lock in Time Capsule</>
         )}
       </button>
 

@@ -3,9 +3,14 @@
 // =============================================================
 // Popup แจ้งเตือนสไตล์โทรเลขวินเทจ
 // Types: success, error, locked, info
+// พร้อม Envelope Animation สำหรับเปิดแคปซูลสำเร็จ
 // =============================================================
 
 function Notification({ type, title, message, onDismiss }) {
+  // ─── ตรวจสอบว่าเป็นข้อความที่เปิดเผยจาก Capsule หรือไม่ ───
+  const revealedMatch = message.match(/<revealed>(.*?)<\/revealed>/s)
+  const isRevealed = !!revealedMatch
+
   // ─── กำหนด Icon ตามประเภท ───
   const getIcon = () => {
     switch (type) {
@@ -22,22 +27,47 @@ function Notification({ type, title, message, onDismiss }) {
     }
   }
 
-  // ─── Render message — handle <revealed> tag ───
-  const renderMessage = () => {
-    const revealedMatch = message.match(/<revealed>(.*?)<\/revealed>/s)
+  // ─── Render: Envelope Animation (สำหรับ revealed message) ───
+  if (isRevealed) {
+    return (
+      <div className="notification-overlay" onClick={onDismiss}>
+        <div
+          className="notification-card notification-card--envelope"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Envelope Animation */}
+          <div className="envelope-wrapper">
+            <div className="envelope">
+              <div className="envelope-flap" />
+              <div className="envelope-letter">
+                <div className="envelope-letter-header">
+                  <span className="envelope-letter-seal">✦</span>
+                  <span className="envelope-letter-label">Unsealed Memory</span>
+                  <span className="envelope-letter-seal">✦</span>
+                </div>
+                <p className="envelope-letter-text">{revealedMatch[1]}</p>
+                <div className="envelope-letter-footer">
+                  — from your past self
+                </div>
+              </div>
+              <div className="envelope-body" />
+            </div>
+          </div>
 
-    if (revealedMatch) {
-      return (
-        <div className="notification-message">
-          <span>Your sealed message reads:</span>
-          <span className="revealed-text">"{revealedMatch[1]}"</span>
+          <button
+            className="btn-dismiss"
+            onClick={onDismiss}
+            id="btn-dismiss-notification"
+            style={{ marginTop: '1.5rem' }}
+          >
+            Close Letter ✦
+          </button>
         </div>
-      )
-    }
-
-    return <p className="notification-message">{message}</p>
+      </div>
+    )
   }
 
+  // ─── Render: Default Notification (ปกติ) ───
   return (
     <div className="notification-overlay" onClick={onDismiss}>
       <div
@@ -46,7 +76,7 @@ function Notification({ type, title, message, onDismiss }) {
       >
         <div className="notification-icon">{getIcon()}</div>
         <h3 className="notification-title">{title}</h3>
-        {renderMessage()}
+        <p className="notification-message">{message}</p>
         <button
           className="btn-dismiss"
           onClick={onDismiss}
